@@ -129,6 +129,8 @@ jobs:
           grep -n "^pub const RENDEZVOUS_SERVERS\|^pub const RS_PUB_KEY" "$CONFIG"
           grep -q "72.60.62.246" "$CONFIG" || { echo "FALHA: servidor nao injetado"; exit 1; }
           grep -q "wNwaAuKAAuS5A07luddM7AlWh0yyYC4aEPL1+NF1IpA=" "$CONFIG" || { echo "FALHA: chave nao injetada"; exit 1; }
+          sed -i 's|RwLock::new("RustDesk".to_owned())|RwLock::new("IronDesk Remote".to_owned())|' "$CONFIG"
+          grep -q 'RwLock::new("IronDesk Remote"' "$CONFIG" || { echo "FALHA: nome nao injetado"; exit 1; }
           echo ">>> Injecao IronDesk OK <<<"
 
       - name: Restore bridge files
