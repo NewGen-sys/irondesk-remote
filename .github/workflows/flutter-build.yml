@@ -131,6 +131,8 @@ jobs:
           grep -q "wNwaAuKAAuS5A07luddM7AlWh0yyYC4aEPL1+NF1IpA=" "$CONFIG" || { echo "FALHA: chave nao injetada"; exit 1; }
           sed -i 's|RwLock::new("RustDesk".to_owned())|RwLock::new("IronDesk Remote".to_owned())|' "$CONFIG"
           grep -q 'RwLock::new("IronDesk Remote"' "$CONFIG" || { echo "FALHA: nome nao injetado"; exit 1; }
+          sed -i 's|("powered_by_me", "[^"]*")|("powered_by_me", "IronDesk Remote")|' src/lang/*.rs
+          grep -q '"powered_by_me", "IronDesk Remote"' src/lang/ptbr.rs || { echo "FALHA: powered_by nao trocado"; exit 1; }
           echo ">>> Injecao IronDesk OK <<<"
 
       - name: Restore bridge files
@@ -379,7 +381,21 @@ jobs:
         shell: bash
         run: |
           BASE_URL=${{ env.SIGN_BASE_URL }} SECRET_KEY=${{ secrets.SIGN_SECRET_KEY }} python3 res/job.py sign_files ./SignOutput
+      - name: Empacotar IronDesk Remote (exe unico)
+        shell: bash
+        if: env.UPLOAD_ARTIFACT == 'true'
+        run: |
+          mkdir -p ./IronDeskOut
+          cp "./SignOutput/rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.exe" "./IronDeskOut/IronDesk-Remote.exe"
+          ls -la ./IronDeskOut
 
+      - name: Upload IronDesk Remote
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: env.UPLOAD_ARTIFACT == 'true'
+        with:
+          name: IronDesk-Remote-${{ matrix.job.arch }}
+          path: ./IronDeskOut/IronDesk-Remote.exe
+          if-no-files-found: error
       - name: Publish Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         if: env.UPLOAD_ARTIFACT == 'true'
