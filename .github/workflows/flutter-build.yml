@@ -133,6 +133,8 @@ jobs:
           grep -q 'RwLock::new("IronDesk Remote"' "$CONFIG" || { echo "FALHA: nome nao injetado"; exit 1; }
           sed -i 's|("powered_by_me", "[^"]*")|("powered_by_me", "IronDesk Remote")|' src/lang/*.rs
           grep -q '"powered_by_me", "IronDesk Remote"' src/lang/ptbr.rs || { echo "FALHA: powered_by nao trocado"; exit 1; }
+          sed -i 's|let ext = app_name.to_lowercase();|let ext = "irondesk".to_owned();|g' src/platform/windows.rs
+          test $(grep -c 'let ext = "irondesk".to_owned();' src/platform/windows.rs) -eq 3 || { echo "FALHA: protocolo nao trocado"; exit 1; }
           echo ">>> Injecao IronDesk OK <<<"
 
       - name: Restore bridge files
