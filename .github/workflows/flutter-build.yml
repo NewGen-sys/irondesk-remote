@@ -135,6 +135,8 @@ jobs:
           grep -q '"powered_by_me", "IronDesk Remote"' src/lang/ptbr.rs || { echo "FALHA: powered_by nao trocado"; exit 1; }
           sed -i 's|let ext = app_name.to_lowercase();|let ext = "irondesk".to_owned();|g' src/platform/windows.rs
           test $(grep -c 'let ext = "irondesk".to_owned();' src/platform/windows.rs) -eq 3 || { echo "FALHA: protocolo nao trocado"; exit 1; }
+          sed -i 's|let exe = format!("{}\\\\{}.exe", path, crate::get_app_name());|let exe = format!("{}\\\\rustdesk.exe", path);|' src/platform/windows.rs
+          grep -q 'let exe = format!("{}\\\\rustdesk.exe", path);' src/platform/windows.rs || { echo "FALHA: exe path nao corrigido"; exit 1; }
           echo ">>> Injecao IronDesk OK <<<"
 
       - name: Restore bridge files
